@@ -3,7 +3,7 @@
     <div class="body">
         <h1>{{title}}</h1>
             <p>
-              {% for s,duration,updatetime in section_durations %}
+              {% for s, duration, updatetime in section_durations %}
               {{s}} : {{duration}} ({{updatetime}})<br>
               {% endfor %}
             </p>
