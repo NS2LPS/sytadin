@@ -40,8 +40,8 @@ class road:
             self.lastupdatetimes.append( x[-1] if xy else np.nan )
             x = np.array(x, dtype=float)
             y = np.array(y, dtype=float)
-            interp = interp1d(x, y)
-            total_duration += interp(time_axis, bounds_error=False)
+            interp = interp1d(x, y, bounds_error=False)
+            total_duration += interp(time_axis)
         self.time_axis = time_axis
         self.total_duration = total_duration
 
