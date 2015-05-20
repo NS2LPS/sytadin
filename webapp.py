@@ -13,7 +13,7 @@ basedir = '/home/jesteve72/sytadin'
 
 # Data logger class
 sections = {'A10_Massy_Wissous':'A10 Massy => Wissous','A6B_Wissous_PItalie':'A6B Wissous => BP','BP_PItalie_PBercy':"BP P. d'Italie => P. de Bercy"}
-section_loggers = dict([ (s, datalogger_mysql(s)) for s in sections])
+section_loggers = dict([ (s, datalogger_mysql(s)) for s in sections.iterkeys()])
 
 
 # Temperature and humidity logger plotter class
@@ -87,9 +87,9 @@ def main(name):
 
 @route('/<name>/logview')
 def logview(name):
-    if name not in sections: return 'Invalid section name.\n'
-    s = sections[name]
-    logentries = [ (t,data) for t,data in s.select_all() ]
+    if name not in section_loggers: return 'Invalid section name.\n'
+    logger = section_loggers[name]
+    logentries = [ (t,data) for t,data in logger.select_all() ]
     logentries.sort(key = lambda x : -x[0])
     str = 'Log entries for {0} :<BR>\n'.format(name)
     for t,data in logentries:
@@ -99,16 +99,16 @@ def logview(name):
 
 @route('/<name>/log')
 def log(name):
-    if name not in sections: return 'Invalid section name.\n'
-    s = sections[name]
-    s.logdata(timestamp=request.args.get('timestamp'), duration=request.args.get('duration'))
+    if name not in section_loggers: return 'Invalid section name.\n'
+    logger = section_loggers[name]
+    logger.logdata(timestamp=request.args.get('timestamp'), duration=request.args.get('duration'))
     return 'OK\n'
 
 @route('/<name>/reset')
 def reset(name):
-    if name not in sections: return 'Invalid section name.\n'
-    s = sections[name]
-    s.reset()
+    if name not in section_loggers: return 'Invalid section name.\n'
+    logger = section_loggers[name]
+    logger.reset()
     return 'OK\n'
 
 @route('/static/<filename>')
