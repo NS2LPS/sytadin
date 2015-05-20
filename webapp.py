@@ -101,7 +101,7 @@ def logview(name):
 def log(name):
     if name not in section_loggers: return 'Invalid section name.\n'
     logger = section_loggers[name]
-    logger.logdata(timestamp=request.args.get('timestamp'), duration=request.args.get('duration'))
+    logger.logdata(timestamp=request.query.timestamp, duration=request.query.duration)
     return 'OK\n'
 
 @route('/<name>/reset')
