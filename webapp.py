@@ -28,7 +28,7 @@ class road:
 
     def calculate(self, timespan=7200, points=512):
         current_time = time.time()
-        time_axis = linspace(current_time-timespan, current_time, points)
+        time_axis = np.linspace(current_time-timespan, current_time, points)
         total_duration = 0
         self.lastvalues = []
         self.lastupdatetimes = []

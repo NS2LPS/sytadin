@@ -37,8 +37,9 @@ if __name__ == '__main__':
                 if t :
                     try:
                         r = requests.get('http://jesteve72.pythonanywhere.com/{0}/log?timestamp={1}&duration={2}'.format(s, int(timestamp), t))
-                        print r.text
-                        if r.text.strip() != "OK": raise
+                        if r.text.strip() != "OK":
+                            print r.text
+                            raise
                     except:
                         print time.asctime(), 'Connection to pythonanywhere failed'
                 else:
