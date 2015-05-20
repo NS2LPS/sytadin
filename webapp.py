@@ -82,7 +82,7 @@ def main(name):
     return template('layout',
                     title = 'test',#road.label + ' : ' + mystr(sum(road.lastvalues)) +' min',
                     section_durations = [('a','b','c')],#zip(road.sections, [mystr(x)+' min' for x in road.lastvalues], [mystr(x,'time') for x in road.lastupdatetimes]),
-                    figure = fig,
+                    figure = 'bbb',#fig,
                     )
 
 @route('/<name>/logview')
