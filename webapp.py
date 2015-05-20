@@ -80,7 +80,7 @@ def main(name):
     fig = base64.b64encode(fig.getvalue())
     # Fill template
     return template('layout',
-                    title = road.label + ' : ' + mystr(sum(road.lastvalues)) +' min',
+                    title = 'test',#road.label + ' : ' + mystr(sum(road.lastvalues)) +' min',
                     section_durations = zip(road.sections, [mystr(x)+' min' for x in road.lastvalues], [mystr(x,'time') for x in road.lastupdatetimes]),
                     figure = fig,
                     )
