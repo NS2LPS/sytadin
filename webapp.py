@@ -41,7 +41,7 @@ class road:
             x = np.array(x, dtype=float)
             y = np.array(y, dtype=float)
             interp = interp1d(x, y)
-            total_duration += interp1d(plot_time, bounds_error=False)
+            total_duration += interp1d(time_axis, bounds_error=False)
         self.time_axis = time_axis
         self.total_duration = total_duration
 
