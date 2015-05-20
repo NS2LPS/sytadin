@@ -34,7 +34,7 @@ class road:
         self.lastupdatetimes = []
         for s in self.sections:
             logger = section_loggers[s]
-            xy = [ (t, data['duration']) for t,data in logger.select_timespan(timespan) if 'duration' in data]
+            xy = [ (t, data['duration']) for t,data in logger.select_timespan(timespan).iteritems() if 'duration' in data]
             x,y = zip( *sorted( xy ) ) if xy else (np.empty(0), np.empty(0))
             self.lastvalues.append( y[-1] if xy else np.nan )
             self.lastupdatetimes.append( x[-1] if xy else np.nan )
