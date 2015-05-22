@@ -52,6 +52,7 @@ class road:
         fig, ax = self.logplot
         ax.plot_date(dates.epoch2num(self.time_axis), self.total_duration, 'b-', tz='Europe/Paris')
         ax.xaxis.set_major_formatter( dates.DateFormatter('%H:%M') )
+        ax.set_ylabel('Temps de parcours (min)')
         fig.autofmt_xdate()
         fig.tight_layout()
         fig.savefig( output, format='png' )
