@@ -11,10 +11,6 @@ time.tzset()
 
 basedir = '/home/jesteve72/sytadin'
 
-formatter = dates.AutoDateFormatter()
-formatter.scaled[1/(24.*60.)] = '%H:%M'
-formatter.scaled[1/24.] = '%H:%M'
-
 # Data logger class
 sections = {'A10_Massy_Wissous':'A10 Massy => Wissous','A6B_Wissous_PItalie':'A6B Wissous => BP','BP_PItalie_PBercy':"BP P. d'Italie => P. de Bercy"}
 section_loggers = dict([ (s, datalogger_mysql(s)) for s in sections.iterkeys()])
@@ -55,6 +51,7 @@ class road:
     def plot(self, output):
         fig, ax = self.logplot
         ax.plot_date(dates.epoch2num(self.time_axis), self.total_duration, 'b-', tz='Europe/Paris')
+        ax.xaxis.set_major_formatter( dates.DateFormatter('%H:%M') )
         fig.autofmt_xdate()
         fig.tight_layout()
         fig.savefig( output, format='png' )
