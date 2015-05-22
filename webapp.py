@@ -104,6 +104,7 @@ def logview(name):
 def log(name):
     if name not in section_loggers: return 'Invalid section name.\n'
     logger = section_loggers[name]
+    logger.delete_timespan(7200)
     logger.logdata(timestamp=int(request.query.timestamp), duration=int(request.query.duration))
     return 'OK\n'
 

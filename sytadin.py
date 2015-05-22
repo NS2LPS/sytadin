@@ -1,7 +1,6 @@
 import requests
 from bs4 import BeautifulSoup
 import re
-import numpy as np
 import time
 
 class Sytadin:
@@ -44,4 +43,4 @@ if __name__ == '__main__':
                         print time.asctime(), 'Connection to pythonanywhere failed'
                 else:
                     print time.asctime(), "Could not retrieve duration for", s
-        time.sleep(6)
+        time.sleep(60)

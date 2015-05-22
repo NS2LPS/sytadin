@@ -45,5 +45,8 @@ class datalogger_mysql(mySQL_DB):
         self.conn.commit()
         self.query("CREATE TABLE IF NOT EXISTS {0} (time INT, data VARCHAR(512));".format(self.name))
         self.conn.commit()
+    def delete_timespan(self, timespan):
+        now = int( time.time() )
+        self.query("DELETE FROM {0} WHERE time<{1};".format(self.name, now-timespan))
     def close(self):
         self.conn.close()
