@@ -1,5 +1,5 @@
-from bottle import default_app, route, template, static_file, request, redirect, response
-import time, os, sys, cStringIO, base64
+from bottle import default_app, route, template, static_file, request
+import time, os, cStringIO, base64
 import numpy as np
 from scipy.interpolate import interp1d
 from matplotlib.pyplot import subplots
