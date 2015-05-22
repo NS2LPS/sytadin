@@ -38,10 +38,13 @@ class road:
             x,y = zip( *sorted( xy ) ) if xy else (np.empty(0), np.empty(0))
             self.lastvalues.append( y[-1] if xy else np.nan )
             self.lastupdatetimes.append( x[-1] if xy else np.nan )
-            x = np.array(x, dtype=float)
-            y = np.array(y, dtype=float)
-            interp = interp1d(x, y, bounds_error=False)
-            total_duration += interp(time_axis)
+            if xy:
+                x = np.array(x, dtype=float)
+                y = np.array(y, dtype=float)
+                interp = interp1d(x, y, bounds_error=False)
+                total_duration += interp(time_axis)
+            else:
+                total_duration = time_axis*np.nan
         self.time_axis = time_axis
         self.total_duration = total_duration
 
@@ -60,7 +63,7 @@ def mystr(x, fmt=None):
     if fmt=='date' : return time.asctime( time.localtime( float(x) ) )
     if fmt=='time' :
         ts = time.struct_time(time.localtime(float(x)))
-        return '{0:02d}:{1:02d}'.format(ts.tm_hour,ts.tm_min)
+        return '{0:02d}h{1:02d}'.format(ts.tm_hour,ts.tm_min)
     return str(x)
 
 # Web server
@@ -80,9 +83,9 @@ def main(name):
     fig = base64.b64encode(fig.getvalue())
     # Fill template
     return template('layout',
-                    title = 'test',#road.label + ' : ' + mystr(sum(road.lastvalues)) +' min',
-                    section_durations = [('a','b','c')],#zip(road.sections, [mystr(x)+' min' for x in road.lastvalues], [mystr(x,'time') for x in road.lastupdatetimes]),
-                    figure = 'bbb',#fig,
+                    title = road.label + ' : ' + mystr(sum(road.lastvalues)) +' min',
+                    section_durations = zip([sections[s] for s in road.sections], [mystr(x)+' min' for x in road.lastvalues], [mystr(x,'time') for x in road.lastupdatetimes]),
+                    figure = fig,
                     )
 
 @route('/<name>/logview')
@@ -101,7 +104,7 @@ def logview(name):
 def log(name):
     if name not in section_loggers: return 'Invalid section name.\n'
     logger = section_loggers[name]
-    logger.logdata(timestamp=request.query.timestamp, duration=request.query.duration)
+    logger.logdata(timestamp=int(request.query.timestamp), duration=int(request.query.duration))
     return 'OK\n'
 
 @route('/<name>/reset')
@@ -109,6 +112,12 @@ def reset(name):
     if name not in section_loggers: return 'Invalid section name.\n'
     logger = section_loggers[name]
     logger.reset()
+    return 'OK\n'
+
+@route('/resetall')
+def resetall():
+    for logger in section_loggers.itervalues():
+        logger.reset()
     return 'OK\n'
 
 @route('/static/<filename>')
