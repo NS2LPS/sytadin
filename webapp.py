@@ -5,6 +5,7 @@ from scipy.interpolate import interp1d
 from matplotlib.pyplot import subplots
 from matplotlib import dates
 from datalogger import datalogger_mysql
+from pytz import timezone
 
 os.environ['TZ'] = 'Europe/Paris'
 time.tzset()
@@ -18,15 +19,16 @@ section_loggers = dict([ (s, datalogger_mysql(s)) for s in sections.iterkeys()])
 
 # Temperature and humidity logger plotter class
 class road:
+    dateformatter = dates.DateFormatter('%H:%M', tz=timezone('Europe/Paris'))
     def __init__(self, label, sections):
         self.sections = sections
         self.label = label
         fig, ax = subplots()
-        fig.set_size_inches(8.675,  2.625)
+        fig.set_size_inches(8.675,  1.5*2.625)
         ax.hold(False)
         self.logplot = (fig, ax)
 
-    def calculate(self, timespan=7200, points=512):
+    def calculate(self, timespan, points=512):
         current_time = time.time()
         time_axis = np.linspace(current_time-timespan, current_time, points)
         total_duration = 0
@@ -50,9 +52,10 @@ class road:
 
     def plot(self, output):
         fig, ax = self.logplot
-        ax.plot_date(dates.epoch2num(self.time_axis), self.total_duration, 'b-', tz='Europe/Paris')
-        ax.xaxis.set_major_formatter( dates.DateFormatter('%H:%M') )
+        ax.plot_date(dates.epoch2num(self.time_axis), self.total_duration, 'b-')
+        ax.xaxis.set_major_formatter(self.dateformatter)
         ax.set_ylabel('Temps de parcours (min)')
+        ax.set_ylim(np.nanmin(self.total_duration)-2., np.nanmax(self.total_duration)+2.)
         fig.autofmt_xdate()
         fig.tight_layout()
         fig.savefig( output, format='png' )
@@ -72,13 +75,14 @@ def mystr(x, fmt=None):
 roads = {'italie' : road("Porte d'Italie",['A10_Massy_Wissous','A6B_Wissous_PItalie']),
          'bercy': road("Porte de Bercy",['A10_Massy_Wissous','A6B_Wissous_PItalie', "BP_PItalie_PBercy"]),
          }
+timespan = 14400
 
 @route('/<name>')
 def main(name):
     # Load house
     if name not in roads: return 'Route inconnue.'
     road = roads[name]
-    road.calculate()
+    road.calculate(timespan)
     # Create figure
     fig = cStringIO.StringIO()
     road.plot(fig)
@@ -106,7 +110,7 @@ def logview(name):
 def log(name):
     if name not in section_loggers: return 'Invalid section name.\n'
     logger = section_loggers[name]
-    logger.delete_timespan(7200)
+    logger.delete_timespan(timespan)
     logger.logdata(timestamp=int(request.query.timestamp), duration=int(request.query.duration))
     return 'OK\n'
 
