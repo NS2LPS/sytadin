@@ -1,3 +1,4 @@
+
 import requests
 from bs4 import BeautifulSoup
 import re
@@ -53,7 +54,7 @@ if __name__ == '__main__':
             for s,r in sections.iteritems():
                 t = syt.gettime(r)
                 if t :
-                    body = 'timestamp={1}&duration={2}'.format(int(timestamp), t)
+                    body = 'timestamp={0}&duration={1}'.format(int(timestamp), t)
                     if datetime.datetime.today().weekday()<=40:
                         index = time.localtime(timestamp).tm_min + time.localtime(timestamp).tm_hour*60
                         tm = make_average('{0}.dat'.format(s) , index, t)
