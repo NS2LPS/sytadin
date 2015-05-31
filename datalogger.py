@@ -29,7 +29,7 @@ class datalogger_mysql(mySQL_DB):
     def __init__(self, name):
         self.query("CREATE TABLE IF NOT EXISTS {0} (time INT, data VARCHAR(512));".format(name))
         self.name = name
-    @static
+    @staticmethod
     def query(sql):
         return db_connection.query(sql)
     def logdata(self, timestamp=None, **data):
