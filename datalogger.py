@@ -33,7 +33,7 @@ class datalogger_mysql(mySQL_DB):
     def query(sql):
         return db_connection.query(sql)
     def logdata(self, timestamp=None, **data):
-        timestamp = int(time.time() ) if timestamp is None else timestamp
+        timestamp = int(time.time() ) if timestamp is None else int(timestamp)
         data = json.dumps(data)
         self.query("INSERT INTO {0} () VALUES({1},'{2}');".format(self.name, timestamp, data))
         self.conn.commit()
