@@ -6,24 +6,32 @@ param = dict(
     passwd = 'sql1502',
     db = 'jesteve72$default')
 
+
 class mySQL_DB(object):
-  def connect(self):
+  def __init__(self):
     self.conn = MySQLdb.connect(**param)
   def query(self, sql):
     try:
       cursor = self.conn.cursor()
       cursor.execute(sql)
     except (AttributeError, MySQLdb.OperationalError):
-      self.connect()
+      self.__init__()
       cursor = self.conn.cursor()
       cursor.execute(sql)
     return cursor
+  def close(self):
+    self.conn.close()
+
+
+db_connection = mySQL_DB()
 
 class datalogger_mysql(mySQL_DB):
     def __init__(self, name):
-        self.connect()
         self.query("CREATE TABLE IF NOT EXISTS {0} (time INT, data VARCHAR(512));".format(name))
         self.name = name
+    @static
+    def query(sql):
+        return db_connection.query(sql)
     def logdata(self, timestamp=None, **data):
         timestamp = int(time.time() ) if timestamp is None else timestamp
         data = json.dumps(data)
@@ -48,5 +56,3 @@ class datalogger_mysql(mySQL_DB):
     def delete_timespan(self, timespan):
         now = int( time.time() )
         self.query("DELETE FROM {0} WHERE time<{1};".format(self.name, now-timespan))
-    def close(self):
-        self.conn.close()
