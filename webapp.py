@@ -24,7 +24,6 @@ class road:
         self.label = label
         fig, ax = subplots()
         fig.set_size_inches(8.675,  1.5*2.625)
-        ax.hold(False)
         self.logplot = (fig, ax)
 
     @staticmethod
@@ -34,8 +33,12 @@ class road:
             x,y = zip( *sorted( xy ) )
             x = np.array(x, dtype=float)
             y = np.array(y, dtype=float)
-            interp = interp1d(x, y, bounds_error=False)
-            return y[-1], x[-1], interp(time_axis)
+            if len(x)>1:
+                interp = interp1d(x, y, bounds_error=False)
+                res = interp(time_axis)
+            else:
+                res = time_axis*np.nan
+            return y[-1], x[-1], res
         else:
             return np.nan, np.nan, time_axis*np.nan
 
@@ -48,12 +51,12 @@ class road:
         self.lastvalues = []
         self.lastupdatetimes = []
         for s in self.sections:
-            lastvalue, lastupdate, duration = __interp__(section_loggers[s], timespan, 'duration', time_axis)
+            lastvalue, lastupdate, duration = self.__interp__(section_loggers[s], timespan, 'duration', time_axis)
             self.lastvalues.append( lastvalue )
             self.lastupdatetimes.append(lastupdate )
             total_duration += duration
         for s in self.sections:
-            lastvalue, lastupdate, average = __interp__(section_loggers[s+'_average'], timespan, 'average', time_axis)
+            lastvalue, lastupdate, average = self.__interp__(section_loggers[s], timespan, 'average', time_axis)
             total_duration_average += average
         self.time_axis = time_axis
         self.total_duration = total_duration
@@ -62,7 +65,9 @@ class road:
     def plot(self, output):
         fig, ax = self.logplot
         x = dates.epoch2num(self.time_axis)
-        ax.plot_date(x, self.total_duration, 'b-', x, self.total_duration_average, 'r-')
+        ax.cla()
+        ax.plot_date(x, self.total_duration, 'b-')
+        ax.plot_date(x, self.total_duration_average, 'r-')
         ax.xaxis.set_major_formatter(self.dateformatter)
         ax.set_ylabel('Temps de parcours (min)')
         ax.set_ylim(np.nanmin(self.total_duration)-2., np.nanmax(self.total_duration)+2.)
@@ -99,9 +104,9 @@ def main(name):
     fig = base64.b64encode(fig.getvalue())
     # Fill template
     return template('layout',
-                    title = road.label + ' : ' + mystr(sum(road.lastvalues)) +' min',
+                    title = road.label + ' : ' + mystr(int(sum(road.lastvalues))) +' min',
                     section_durations = zip([sections[s] for s in road.sections],
-                        [mystr(x)+' min' for x in road.lastvalues],
+                        [mystr(int(x))+' min' for x in road.lastvalues],
                         [mystr(x,'time') for x in road.lastupdatetimes]),
                     figure = fig,
                     )
@@ -123,7 +128,7 @@ def log(name):
     if name not in section_loggers: return 'Invalid section name.\n'
     logger = section_loggers[name]
     logger.delete_timespan(timespan)
-    logger.logdata(**request.query.timestamp)
+    logger.logdata(**request.query)
     return 'OK\n'
 
 @route('/<name>/reset')

@@ -19,6 +19,8 @@ class mySQL_DB(object):
       cursor = self.conn.cursor()
       cursor.execute(sql)
     return cursor
+  def commit(self):
+      self.conn.commit()
   def close(self):
     self.conn.close()
 
@@ -32,11 +34,14 @@ class datalogger_mysql(mySQL_DB):
     @staticmethod
     def query(sql):
         return db_connection.query(sql)
+    @staticmethod
+    def commit():
+        db_connection.commit()
     def logdata(self, timestamp=None, **data):
         timestamp = int(time.time() ) if timestamp is None else int(timestamp)
         data = json.dumps(data)
         self.query("INSERT INTO {0} () VALUES({1},'{2}');".format(self.name, timestamp, data))
-        self.conn.commit()
+        self.commit()
     def query_decode(self, query):
         c = self.query(query)
         d = dict(c.fetchall())
@@ -50,9 +55,9 @@ class datalogger_mysql(mySQL_DB):
         return self.query_decode("SELECT * FROM {0} WHERE time>{1};".format(self.name, now-timespan))
     def reset(self):
         self.query("DROP TABLE {0}".format(self.name))
-        self.conn.commit()
+        self.commit()
         self.query("CREATE TABLE IF NOT EXISTS {0} (time INT, data VARCHAR(512));".format(self.name))
-        self.conn.commit()
+        self.commit()
     def delete_timespan(self, timespan):
         now = int( time.time() )
         self.query("DELETE FROM {0} WHERE time<{1};".format(self.name, now-timespan))
