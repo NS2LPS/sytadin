@@ -80,6 +80,7 @@ class road:
 def mystr(x, fmt=None):
     if np.isnan(x) : return '??'
     if fmt=='float': return '{0:.1f}'.format( x )
+    if fmt=='int'  : return str(int(x))
     if fmt=='date' : return time.asctime( time.localtime( float(x) ) )
     if fmt=='time' :
         ts = time.struct_time(time.localtime(float(x)))
@@ -104,9 +105,9 @@ def main(name):
     fig = base64.b64encode(fig.getvalue())
     # Fill template
     return template('layout',
-                    title = road.label + ' : ' + mystr(int(sum(road.lastvalues))) +' min',
+                    title = road.label + ' : ' + mystr(sum(road.lastvalues),'int') +' min',
                     section_durations = zip([sections[s] for s in road.sections],
-                        [mystr(int(x))+' min' for x in road.lastvalues],
+                        [mystr(x,'int')+' min' for x in road.lastvalues],
                         [mystr(x,'time') for x in road.lastupdatetimes]),
                     figure = fig,
                     )
